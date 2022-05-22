@@ -111,13 +111,13 @@ function cuentaCrono() {
     tiempo = 11; // Porque restaCuenta() le resta 1.
     restaCuenta();
     cronometro = setInterval(restaCuenta, 1000);
-    parada10s  = setTimeout( parateCrono, limite());
+    parada10s  = setTimeout( parateCrono, limite(10));
 }
 
 
 /* Contador según navegador */
-function limite() {
-    return navigator.userAgent.indexOf("Firefox") > -1 ? 11000 : 10000;
+function limite(segundos) {
+    return navigator.userAgent.indexOf("Firefox") > -1 ? segundos * 1000 + 1000 : segundos;
 }
 
 
