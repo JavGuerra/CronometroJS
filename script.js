@@ -115,7 +115,7 @@ function cuentaCrono() {
 }
 
 
-/* Contador según navegador */
+/* Milisegundos según navegador */
 function limite(miliSeg) {
     return navigator.userAgent.indexOf("Firefox") > -1 ? miliSeg + 1000 : miliSeg;
 }
