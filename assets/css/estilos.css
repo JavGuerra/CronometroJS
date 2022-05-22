@@ -1,0 +1,191 @@
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.2/font/bootstrap-icons.css");
+
+body {
+  margin: 2em auto;
+  max-width: 50em;
+  text-align: center;
+}
+
+@font-face {
+  font-family: "Digit";
+  src: url("../fonts/Digit.ttf") format("truetype");
+}
+
+#resulta {
+  font-family: "Digit";
+  text-shadow: 5px 5px 5px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 5px 5px 10px rgba(0, 0, 0, 0.33);
+  background: linear-gradient(45deg, #bcc6a3, Beige);
+  border: 9px solid lightgray;
+  border-radius: 20px;
+  color: DimGray;
+  width: 85%;
+  margin: 0 auto 1.75em;
+  padding: 0 0.5em 0.5em;
+}
+
+.tiempo, .separa {
+  font-size: 6em;
+}
+
+.medida {
+  font-size: 4em;
+}
+
+.espacio {
+  margin-left: 0.5em;
+  margin-right: 0.5em;
+}
+
+.ancho {
+  width: auto;
+}
+
+.crono {
+  width: 75px;
+}
+
+.fecha {
+  width: auto;
+}
+
+#listado {
+  margin: 1.75em 0 1em;
+  padding: 0 0.5em;
+}
+
+#grBotones {
+  display: inline-block;
+}
+
+button {
+  width: 34px !important;
+  border-radius: 17px;
+  border: 1px solid Gray;
+  margin: 0.5em 0.25em;
+  padding: 0.5em;
+  cursor: pointer;
+}
+
+button:enabled {
+  box-shadow: rgba(0, 0, 0, 0.15) 2.4px 2.4px 3.2px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  border: 1px solid lightgray;
+}
+
+table {
+  margin: 0 auto;
+  border-collapse: collapse;
+}
+
+th {
+  font-variant: small-caps;
+}
+
+td button {
+  width: auto !important;
+  margin: 0;
+  padding: 0 !important;
+  border: 0;
+  background: none;
+  box-shadow: none !important;
+}
+
+th, td {
+  vertical-align: top;
+  padding-left: 0.25em !important;
+  padding-right: 0.25em !important;
+}
+
+caption h2 {
+  margin-bottom: 0.75em !important;
+}
+
+.bi-trash3 {
+  cursor: pointer;
+  color: DimGray;
+}
+
+.bi-trash3:hover {
+  color: Black;
+}
+
+caption, table {
+  animation: fadeIn linear 0.3s;
+  -webkit-animation: fadeIn linear 0.3s;
+  -moz-animation: fadeIn linear 0.3s;
+  -o-animation: fadeIn linear 0.3s;
+  -ms-animation: fadeIn linear 0.3s;
+}
+
+@keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-moz-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-o-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@-ms-keyframes fadeIn {
+  0% {opacity:0;}
+  100% {opacity:1;}
+}
+
+@media (min-width: 600px) {
+  table, hr {
+    width: 590px !important;
+  }
+
+  th, td {
+    padding-left: 1em !important;
+    padding-right: 1em !important;
+  }
+
+  button {
+    margin: 0 0.5em;
+  }
+
+  #resulta {
+    width: 562px;
+  }
+
+  .espacio {
+    margin-left: 1.5em;
+    margin-right: 1.5em;
+  }
+
+  .ancho {
+    width: 50px;
+  }
+
+  .crono {
+    width: auto;
+  }  
+  
+  .fecha {
+    width: 190px;
+  }
+}
+
+/* Hace que los mensajes sean sólo visibles para lectores de pantalla.   */
+/* alternativas: top:-9999px; o left:-9999px; o text-indent:-9999px; ... */
+.sr {
+  position: absolute;
+  overflow: hidden;
+  text-indent: -9999px;
+}

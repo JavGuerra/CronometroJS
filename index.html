@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="author" content="Javier Guerra" />
+    <meta name="description" content="Cronometra y guarda" />
+    <meta name="keywords" content="ejercicio, JavaScript, localStorage, intervalos" />
+    <meta name='date' content='May. 19, 2022'>
+    <title>CronómetroJS</title>
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@javgr" />
+    <meta property="og:url" content="https://javguerra.github.io/CronometroJS/index.html" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="CronómetroJS" />
+    <meta property="og:description" content="Cronómetro que gestiona sesiones de los cronometrajes." />
+    <meta property="og:image" content="assets/img/banner.png" />
+    <meta property="og:image:type" content="image/png" />
+    <meta property="og:image:width" content="1024" />
+    <meta property="og:image:height" content="512" />
+    <meta property="og:image:alt" content="Banner" />
+    <meta property="og:locale" content="es_ES" />
+    <link rel="canonical" href="https://javguerra.github.io/CronometroJS/index.html" />
+    <link rel="manifest" href="manifest.json" />
+    <link rel="icon" type="image/png" href="assets/img/crono.png"/>
+    <link rel="stylesheet" href="assets/css/wysiwyg.css">
+    <link rel="stylesheet" href="assets/css/estilos.css">
+    <script defer src="script.js"></script>
+</head>
+
+<body>
+    <div class="wysiwyg">
+        <noscript>
+            <p>
+                La página web que está viendo usa JavaScript, por lo que, para su
+                correcto funcionamiento, debe tenerlo activado en el navegador.
+            </p>
+        </noscript>
+
+        <header role="banner">
+            <h1>Cronómetro</h1>
+        </header>
+
+        <main>
+            <section id="resulta" role="timer" aria-live="polite" aria-atomic="true">
+                <span class="tiempo">00</span><span class="medida"> s</span>
+            </section>
+
+            <section id="navegacion">
+                <nav aria-label="Botonera">
+                    <button id="inicia" title="Iniciar">
+                        <i class="bi bi-play-fill"></i>
+                        <span class="sr">Iniciar</span>
+                    </button>
+                    <button id="contin" title="Continuar">
+                        <i class="bi bi-arrow-clockwise"></i>
+                        <span class="sr">Continuar</span>
+                    </button>
+                    <button id="parate" title="Parar">
+                        <i class="bi bi-pause-fill"></i>
+                        <span class="sr">Parar</span>
+                    </button>
+                    <button id="cuenta" title="Contar 10" class="espacio">
+                        <i class="bi bi-stopwatch"></i>
+                        <span class="sr">Contar 10</span>
+                    </button>
+                    <div id="grBotones">
+                        <button id="guarda" title="Guardar">
+                            <i class="bi bi-plus-lg"></i>
+                            <span class="sr">Guardar</span>
+                        </button>
+                        <button id="histor" title="Historial">
+                            <i class="bi bi-list-ol"></i>
+                            <span class="sr">Historial</span>
+                        </button>
+                        <button id="borrar" title="Borrar">
+                            <i class="bi bi-x-lg"></i>
+                            <span class="sr">Borrar</span>
+                        </button>
+                    </div>
+                </nav>
+            </section>
+            
+            <section id="listado" role="region" aria-live="polite"></section>
+        </main>
+
+        <footer role="contentinfo">
+            <p>
+				<small>
+					Por: <strong>Javier Guerra</strong> &nbsp;|&nbsp; 
+					<a target="_blank" href="https://javguerra.github.io/2022-05-22-cronometro-js/">+info</a>
+				</small>
+            </p>
+        </footer>
+    </div>
+</body>
+
+</html>
