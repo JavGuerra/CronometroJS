@@ -209,10 +209,10 @@ function botonsCuenta() {
 function btnInactivo(boton, estado) {
     if (estado) {
       boton.disabled = true;
-      boton.setAttribute('aria-disabled', 'true');
+      boton.setAttribute('aria-disabled', true);
     } else {
       boton.disabled = false;
-      boton.setAttribute('aria-disabled', 'false');
+      boton.setAttribute('aria-disabled', false);
     }
 }
 
