@@ -241,6 +241,7 @@ function existeClave(clave) {
 /* Guarda en localStorage las sesiones */
 function guardaLocal() {
     let hoy, fecha, hora, fechaHora;
+    parateCrono();
     btnInactivo(btnGuarda, true);
     
     hoy = new Date();
