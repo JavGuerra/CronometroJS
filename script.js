@@ -29,6 +29,7 @@ https://es.javascript.info/localstorage
 // Nota: La aplicación maneja sólo minutos y segundos. Máximo 3.599 segundos.
 
 let cronometro, parada10s;
+let playCuenta = false;
 let sesion = [];
 let numSesion = numClave();
 let tiempo = 0;
@@ -51,7 +52,7 @@ btnGuarda.onclick = guardaLocal;
 btnHistor.onclick = historLocal;
 btnBorrar.onclick = borrarLocal;
 
-/* Botones al inicio */
+/* Botones al inicio y lista */
 btnInactivo(btnInicia, false);
 btnInactivo(btnContin, true);
 btnInactivo(btnParate, true);
@@ -71,6 +72,7 @@ if (existeClave('ultSesion')) {
 function iniciaCrono() {
     botonsCrono(btnInicia);
     poneBtnReinicio(true);
+    playCuenta = false;
 
     parateCrono();
     tiempo = -1; // Porque sumaCrono() le suma 1.
@@ -109,6 +111,7 @@ function cuentaCrono() {
     parateCrono();
     botonsCuenta();
     poneBtnReinicio(false);
+    playCuenta = true;
 
     tiempo = 11; // Porque restaCuenta() le resta 1.
     restaCuenta();
@@ -242,7 +245,7 @@ function existeClave(clave) {
 function guardaLocal() {
     let hoy, fecha, hora, fechaHora;
     parateCrono();
-    btnInactivo(btnContin, true);
+    if (playCuenta) btnInactivo(btnContin, true);
     btnInactivo(btnGuarda, true);
     
     hoy = new Date();
