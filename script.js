@@ -70,6 +70,7 @@ if (existeClave('ultSesion')) {
 /* Inicia el cronómetro */
 function iniciaCrono() {
     botonsCrono(btnInicia);
+    poneBtnReinicio(true);
 
     parateCrono();
     tiempo = -1; // Porque sumaCrono() le suma 1.
@@ -107,6 +108,7 @@ function parateCrono() {
 function cuentaCrono() {
     parateCrono();
     botonsCuenta();
+    poneBtnReinicio(false);
 
     tiempo = 11; // Porque restaCuenta() le resta 1.
     restaCuenta();
@@ -208,6 +210,18 @@ function btnInactivo(boton, estado) {
     } else {
       boton.disabled = false;
       boton.setAttribute('aria-disabled', 'false');
+    }
+}
+
+/* Cambia el icono del botón de inicio/reiniciar */
+function poneBtnReinicio(estado) {
+    let icono = elemento('#inicia i');
+    if (estado) {
+        icono.classList.remove('bi-play-fill');
+        icono.classList.add('bi-arrow-clockwise');
+    } else {
+        icono.classList.remove('bi-arrow-clockwise');
+        icono.classList.add('bi-play-fill');
     }
 }
 
