@@ -207,14 +207,10 @@ function botonsCuenta() {
 
 /* Cambia el estado de un botón dado */
 function btnInactivo(boton, estado) {
-    if (estado) {
-      boton.disabled = true;
-      boton.setAttribute('aria-disabled', true);
-    } else {
-      boton.disabled = false;
-      boton.setAttribute('aria-disabled', false);
-    }
+    boton.disabled = estado ? true : false;
+    boton.setAttribute('aria-disabled', estado ? true : false);
 }
+
 
 /* Cambia el icono del botón de inicio/reiniciar */
 function poneBtnReinicio(estado) {
