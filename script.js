@@ -242,6 +242,7 @@ function existeClave(clave) {
 function guardaLocal() {
     let hoy, fecha, hora, fechaHora;
     parateCrono();
+    btnInactivo(btnContin, true);
     btnInactivo(btnGuarda, true);
     
     hoy = new Date();
