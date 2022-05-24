@@ -207,8 +207,8 @@ function botonsCuenta() {
 
 /* Cambia el estado de un botón dado */
 function btnInactivo(boton, estado) {
-    boton.disabled = estado ? true : false;
-    boton.setAttribute('aria-disabled', estado ? true : false);
+    boton.disabled = estado;
+    boton.setAttribute('aria-disabled', estado);
 }
 
 
