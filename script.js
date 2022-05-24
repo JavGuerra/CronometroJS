@@ -288,7 +288,6 @@ function borrarLocal() {
     elListado.textContent = '';
 
     btnInactivo(btnHistor, true);
-    
 }
 
 
