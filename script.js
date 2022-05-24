@@ -415,6 +415,7 @@ function creaFilas(clave, valor) {
         if (!i) {
             button = creaElem('button');
             button.setAttribute('id', `borra${clave}`);
+            button.setAttribute('title', `Borrar sesión ${clave}`);
             button.innerHTML = '<i class="bi bi-trash3"></i>';
             button.innerHTML += `<span class="sr">Borrar sesión ${clave}</span>`;
             td = creaElem('td');
