@@ -22,6 +22,6 @@ Cronómetro en JavaScript
 
 [Usar el cronómetro on-line](https://javguerra.github.io/CronometroJS/)
 
-[Ver más información](https://javguerra.github.io/2022-05-22-cronometro-js/)
+[Ver más información](https://javguerra.github.io/blog/cronometro-js/)
 
 Licencia GNU v.3 - Javier Guerra, mayo 2022
