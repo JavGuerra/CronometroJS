@@ -28,11 +28,18 @@ https://es.javascript.info/localstorage
 
 // Nota: La aplicación maneja sólo minutos y segundos. Máximo 3.599 segundos.
 
-let cronometro, parada10s;
-let playCuenta = false;
+// Helper selectors
+const elemento = (sel) => document.querySelector(sel);
+const creaElem = (el) => document.createElement(el);
+
+// Estado del cronómetro y temporizadores
+let cronometro = null;
+let tiempoInicio = 0;
+let tiempoAcumulado = 0; // Guarda los ms transcurridos al pausar
+let tiempoSegundos = 0;   // Segundos enteros mostrados
+let modoCuenta10 = false;
 let sesion = [];
 let numSesion = numClave();
-let tiempo = 0;
 
 const btnInicia = elemento('#inicia');
 const btnContin = elemento('#contin');
@@ -52,12 +59,13 @@ btnGuarda.onclick = guardaLocal;
 btnHistor.onclick = historLocal;
 btnBorrar.onclick = borrarLocal;
 
-/* Botones al inicio y lista */
+/* Estado inicial de botones */
 btnInactivo(btnInicia, false);
 btnInactivo(btnContin, true);
 btnInactivo(btnParate, true);
 btnInactivo(btnCuenta, false);
 btnInactivo(btnGuarda, true);
+
 if (existeClave('ultSesion')) {
     historLocal();
     btnInactivo(btnHistor, false);
@@ -67,125 +75,114 @@ if (existeClave('ultSesion')) {
     btnInactivo(btnBorrar, true);
 }
 
-
-/* Inicia el cronómetro */
+/* Inicia el cronómetro desde cero */
 function iniciaCrono() {
     botonsCrono(btnInicia);
     poneBtnReinicio(true);
-    playCuenta = false;
+    modoCuenta10 = false;
 
     parateCrono();
-    tiempo = -1; // Porque sumaCrono() le suma 1.
-    sumaCrono();
+    tiempoAcumulado = 0;
+    tiempoSegundos = 0;
+    actualizaPantalla(0);
     continCrono();
 }
 
-
-/* Continua el cronómetro tras la pausa */
+/* Continúa el cronómetro usando marcas de tiempo (preciso en todos los navegadores) */
 function continCrono() {
     botonsCrono(btnContin);
 
-    cronometro = setInterval(sumaCrono, 1000);
+    if (!cronometro) {
+        tiempoInicio = Date.now() - tiempoAcumulado;
+
+        cronometro = setInterval(() => {
+            const msTranscurridos = Date.now() - tiempoInicio;
+
+            if (modoCuenta10) {
+                const msRestantes = 10000 - msTranscurridos;
+                tiempoSegundos = Math.max(0, Math.ceil(msRestantes / 1000));
+                actualizaCuenta(tiempoSegundos);
+
+                if (msRestantes <= 0) {
+                    parateCrono();
+                    btnInactivo(btnContin, true);
+                }
+            } else {
+                tiempoSegundos = Math.floor(msTranscurridos / 1000);
+                actualizaPantalla(tiempoSegundos);
+
+                if (tiempoSegundos >= 3599) { // Máximo 59 min 59 s
+                    parateCrono();
+                    btnInactivo(btnContin, true);
+                }
+            }
+        }, 100);
+    }
 }
 
-
-/* Para el cronómetro o el tiempo */
+/* Detiene el cronómetro conservando el tiempo transcurrido */
 function parateCrono() {
-    botonsCrono(btnParate);
+    botonsParate();
 
     if (cronometro) {
         clearInterval(cronometro);
         cronometro = null;
+        if (tiempoInicio > 0) {
+            tiempoAcumulado = Date.now() - tiempoInicio;
+        }
     }
-    if (parada10s ) {
-        clearInterval(parada10s );
-        parada10s  = null;
-        btnInactivo(btnContin, true);
-    } 
-    if (!tiempo) btnInactivo(btnGuarda, true);
+
+    if (tiempoSegundos === 0 && !tiempoAcumulado) {
+        btnInactivo(btnGuarda, true);
+    }
 }
 
-
-/* Inicia la cuenta hasta 10 */
+/* Inicia la cuenta de 10 a 0 segundos */
 function cuentaCrono() {
     parateCrono();
     botonsCuenta();
     poneBtnReinicio(false);
-    playCuenta = true;
 
-    tiempo = 11; // Porque restaCuenta() le resta 1.
-    restaCuenta();
-    cronometro = setInterval(restaCuenta, 1000);
-    parada10s  = setTimeout( parateCrono, limite(10000));
+    modoCuenta10 = true;
+    tiempoAcumulado = 0;
+    tiempoSegundos = 10;
+    actualizaCuenta(10);
+
+    continCrono();
 }
 
+/* Renderizado HTML con las mismas clases CSS originales */
+function actualizaPantalla(t) {
+    const minSeg = separa(t);
+    let formato = `<span class="tiempo">${minSeg.segundos}</span><span class="medida"> s</span>`;
 
-/* Milisegundos según navegador */
-function limite(miliSeg) {
-    return navigator.userAgent.indexOf("Firefox") > -1 ? miliSeg + 1000 : miliSeg;
-}
-
-
-/* Suma y muestra minutos y segundos */
-function sumaCrono() {
-    let minSeg, formato;
-
-    tiempo++;
-    minSeg = separa(tiempo);
-
-    formato = `<span class="tiempo">${minSeg.segundos}</span>` 
-            + '<span class="medida"> s</span>';
-    if (minSeg.minutos) {
-            formato = `<span class="tiempo">${minSeg.minutos}</span>`
-            + '<span class="medida"> min</span>'
-            + '<span class="separa"> :</span>' + formato;
+    if (parseInt(minSeg.minutos) > 0) {
+        formato = `<span class="tiempo">${minSeg.minutos}</span>`
+                + `<span class="medida"> min</span>`
+                + `<span class="separa"> :</span>` + formato;
     }
 
     elResulta.innerHTML = formato;
-
-    if (minSeg.minutos == 59 && minSeg.segundos == 59) {
-        parateCrono();
-        btnInactivo(btnContin, true);
-    }
 }
 
-
-/* Resta y muestra el tiempo */
-function restaCuenta() {
-    let formato;
-
-    tiempo--;
-
-    formato = `<span class="tiempo">${digitos(tiempo)}</span>`
-            + '<span class="medida"> s</span>';  
-     
-    elResulta.innerHTML = formato;
+function actualizaCuenta(t) {
+    elResulta.innerHTML = `<span class="tiempo">${digitos(t)}</span><span class="medida"> s</span>`;
 }
 
-
-/* Devuelve dos dígitos */
 function digitos(numero) {
-    return numero < 10 ? '0' + numero : numero ;
+    return numero < 10 ? '0' + numero : numero;
 }
 
-
-/* Devuelve un objeto con los minutos y segundos */
-function separa(tiempo) {
-    let minutos, segundos;
-
-    if (tiempo  >= 60) {
-        minutos  = digitos(Math.trunc(tiempo / 60));
-        segundos = digitos(tiempo % 60);
-    } else {
-        minutos  = 0;
-        segundos = digitos(tiempo);
-    }
-
-    return {'minutos': minutos, 'segundos': segundos};
+function separa(tiempoSeg) {
+    const minutos = Math.trunc(tiempoSeg / 60);
+    const segundos = tiempoSeg % 60;
+    return {
+        minutos: digitos(minutos),
+        segundos: digitos(segundos)
+    };
 }
 
-
-/* Activa y desactiva botones según cronómetro */
+/* Gestión de estados de botones */
 function botonsCrono(boton) {
     btnInactivo(btnInicia, false);
     btnInactivo(btnContin, false);
@@ -195,8 +192,6 @@ function botonsCrono(boton) {
     btnInactivo(boton, true);
 }
 
-
-/* Activa y desactiva botones según contador */
 function botonsCuenta() {
     btnInactivo(btnParate, false);
     btnInactivo(btnGuarda, false);
@@ -204,17 +199,20 @@ function botonsCuenta() {
     btnInactivo(btnCuenta, true);
 }
 
+function botonsParate() {
+    btnInactivo(btnParate, true);
+    btnInactivo(btnContin, false);
+}
 
-/* Cambia el estado de un botón dado */
 function btnInactivo(boton, estado) {
+    if (!boton) return;
     boton.disabled = estado;
     boton.setAttribute('aria-disabled', estado);
 }
 
-
-/* Cambia el icono del botón de inicio/reiniciar */
 function poneBtnReinicio(estado) {
-    let icono = elemento('#inicia i');
+    const icono = elemento('#inicia i');
+    if (!icono) return;
     if (estado) {
         icono.classList.remove('bi-play-fill');
         icono.classList.add('bi-arrow-clockwise');
@@ -224,150 +222,106 @@ function poneBtnReinicio(estado) {
     }
 }
 
-
-/* Obtiene la última clave en localStorage */
+/* LocalStorage y Persistencia */
 function numClave() {
-    return existeClave('ultSesion') ? parseInt(localStorage.ultSesion) + 1 : 1;
+    return existeClave('ultSesion') ? parseInt(localStorage.getItem('ultSesion')) + 1 : 1;
 }
 
-
-/* ¿Existe la clave en localStorage? Devuelve un booleano */
 function existeClave(clave) {
-    return localStorage.getItem(clave) !== undefined && localStorage.getItem(clave);
+    return localStorage.getItem(clave) !== null;
 }
 
-
-/* Guarda en localStorage las sesiones */
 function guardaLocal() {
-    let hoy, fecha, hora, fechaHora;
-    parateCrono();
-    if (playCuenta) btnInactivo(btnContin, true);
-    btnInactivo(btnGuarda, true);
-    
-    hoy = new Date();
-    fecha = `${digitos(hoy.getDate())}-${digitos(hoy.getMonth() + 1)}-${hoy.getFullYear()}`;
-    hora = `${digitos(hoy.getHours())}:${digitos(hoy.getMinutes())}:${digitos(hoy.getSeconds())}`;
-    fechaHora = fecha + ' ' + hora;
+    const hoy = new Date();
+    const fecha = `${digitos(hoy.getDate())}-${digitos(hoy.getMonth() + 1)}-${hoy.getFullYear()}`;
+    const hora = `${digitos(hoy.getHours())}:${digitos(hoy.getMinutes())}:${digitos(hoy.getSeconds())}`;
+    const fechaHora = `${fecha} ${hora}`;
 
-    sesion.push({'segundos': tiempo, 'fechaHora': fechaHora});
+    sesion.push({ segundos: tiempoSegundos, fechaHora: fechaHora });
 
     localStorage.setItem(numSesion, JSON.stringify(sesion));
-    localStorage.ultSesion = numSesion;
+    localStorage.setItem('ultSesion', numSesion);
 
     creaTabla('<i class="bi bi-stopwatch"></i>&nbsp; Sesión actual');
     creaFilas(numSesion, sesion);
 
     btnInactivo(btnBorrar, false);
     btnInactivo(btnHistor, false);
-    if (cronometro || parada10s) btnInactivo(btnGuarda, false);
 }
 
-
-/* Muestra el contenido de localStorage */
 function historLocal() {
-    let i, valor;
     btnInactivo(btnHistor, true);
-
     creaTabla('<i class="bi bi-list-ol"></i>&nbsp; Sesiones guardadas');
 
-    for (i = parseInt(localStorage.ultSesion); i > 0; i--) { 
-        valor = JSON.parse(localStorage.getItem(i));
-        creaFilas(i, valor);
+    const ult = parseInt(localStorage.getItem('ultSesion'));
+    for (let i = ult; i > 0; i--) {
+        const valor = JSON.parse(localStorage.getItem(i));
+        if (valor) creaFilas(i, valor);
     }
 }
 
-
-/* Borra el contenido de localStorage */
 function borrarLocal() {
     btnInactivo(btnBorrar, true);
-    // Procede usar if(confirm('pregunta')), pero para el crono hasta confirmar 
-
     localStorage.clear();
     sesion = [];
     numSesion = 1;
     elListado.textContent = '';
-
     btnInactivo(btnHistor, true);
 }
 
-
-/* Borra la clave de localStorage */
 function borraClave(clave) {
     localStorage.removeItem(clave);
-    let numSesiones = localStorage.length - 1;  // Menos la clave 'ultSesion'.
+    const numSesiones = localStorage.length - 1;
 
-    if (numSesiones) {
-        localStorage.ultSesion = numSesiones;
-
-        if (numSesion == clave) {
+    if (numSesiones > 0) {
+        localStorage.setItem('ultSesion', numSesiones);
+        if (numSesion === clave) {
             sesion = [];
         } else {
-            // Para evitar huecos...
-            ordenaClaves(clave, numSesiones + 1); // +1 sesión que quitamos.
+            ordenaClaves(clave, numSesiones + 1);
             numSesion--;
         }
-
         historLocal();
-        
     } else {
         borrarLocal();
     }
 }
 
-
-/* Ordena los números de las sesiones por encima de la clave eliminada */
-function ordenaClaves(clave, numSesiones) {
-    let i, valClave;
-
-    for (i = clave; i < numSesiones; i++) {
-        valClave = localStorage.getItem(i + 1);
+function ordenaClaves(clave, totalSesiones) {
+    for (let i = clave; i < totalSesiones; i++) {
+        const valClave = localStorage.getItem(i + 1);
         localStorage.removeItem(i + 1);
-        localStorage.setItem(i, valClave);
+        if (valClave) localStorage.setItem(i, valClave);
     }
 }
 
-
-/* Crea una tabla con caption que sustituye a la que hubiera */
+/* Construcción de la tabla respetando atributos y clases originales */
 function creaTabla(titulo) {
-    let thead, tbody, tr, th, hr;
+    let thead, tbody, tr, th, hr, caption, table;
 
     tr = creaElem('tr');
 
-    th = creaElem('th');
-    th.setAttribute('scope', 'col');
-    th.classList.add('ancho');
-    th.innerHTML = '<small>Clave</small>';
-    tr.appendChild(th);
+    const columnas = [
+        { txt: 'Clave', clase: 'ancho' },
+        { txt: 'Núm.', clase: 'ancho' },
+        { txt: 'Crono', clase: 'crono' },
+        { txt: 'Fecha / Hora', clase: 'fecha' },
+        { txt: 'Borra', clase: 'ancho' }
+    ];
 
-    th = creaElem('th');
-    th.setAttribute('scope', 'col');
-    th.classList.add('ancho');
-    th.innerHTML = '<small>Núm.</small>';
-    tr.appendChild(th);
-
-    th = creaElem('th');
-    th.setAttribute('scope', 'col');
-    th.classList.add('crono');
-    th.innerHTML = '<small>Crono</small>';
-    tr.appendChild(th);
-
-    th = creaElem('th');
-    th.setAttribute('scope', 'col');
-    th.classList.add('fecha');
-    th.innerHTML = '<small>Fecha / Hora</small>';
-    tr.appendChild(th);
-
-    th = creaElem('th');
-    th.setAttribute('scope', 'col');
-    th.classList.add('ancho');
-    th.innerHTML = '<small>Borra</small>';
-    tr.appendChild(th);
+    columnas.forEach(col => {
+        th = creaElem('th');
+        th.setAttribute('scope', 'col');
+        th.classList.add(col.clase);
+        th.innerHTML = `<small>${col.txt}</small>`;
+        tr.appendChild(th);
+    });
 
     thead = creaElem('thead');
     thead.appendChild(tr);
 
     tbody = creaElem('tbody');
-    tbody.setAttribute("id", "cuerpo");
+    tbody.setAttribute('id', 'cuerpo');
 
     caption = creaElem('caption');
     caption.innerHTML = '<h2>' + titulo + '</h2>';
@@ -381,15 +335,14 @@ function creaTabla(titulo) {
     elListado.append(hr, table);
 }
 
-/* Crea filas en tbody por cada valor del cronómetro guardado en la sesión */
 function creaFilas(clave, valor) {
-    let tr, th, td, minSeg, button;
+    let tr, th, td, minSeg, button, formato;
 
     valor.forEach((obj, i) => {
         tr = creaElem('tr');
 
         if (!i) {
-            tr.setAttribute('id', `clave${clave}`); 
+            tr.setAttribute('id', `clave${clave}`);
             th = creaElem('th');
             th.setAttribute('rowspan', valor.length);
             th.setAttribute('scope', 'rowgroup');
@@ -403,7 +356,8 @@ function creaFilas(clave, valor) {
 
         minSeg = separa(obj.segundos);
         formato = minSeg.segundos + 's';
-        if (minSeg.minutos) formato = minSeg.minutos + 'min, ' + formato;
+        if (parseInt(minSeg.minutos) > 0) formato = minSeg.minutos + 'min, ' + formato;
+
         td = creaElem('td');
         td.innerHTML = '<strong>' + formato + '</strong>';
         tr.appendChild(td);
@@ -418,6 +372,7 @@ function creaFilas(clave, valor) {
             button.setAttribute('title', `Borrar sesión ${clave}`);
             button.innerHTML = '<i class="bi bi-trash3"></i>';
             button.innerHTML += `<span class="sr">Borrar sesión ${clave}</span>`;
+
             td = creaElem('td');
             td.setAttribute('rowspan', valor.length);
             td.appendChild(button);
@@ -427,13 +382,8 @@ function creaFilas(clave, valor) {
         elemento('#cuerpo').appendChild(tr);
     });
 
-    elemento(`#borra${clave}`).onclick = () => borraClave(clave);
+    const btnBorraSesion = elemento(`#borra${clave}`);
+    if (btnBorraSesion) {
+        btnBorraSesion.onclick = () => borraClave(clave);
+    }
 }
-
-
-/* Devuelve un elemento */
-function elemento(sel) { return document.querySelector(sel); }
-
-
-/* Crea y un elemento y lo devuelve */
-function creaElem(el)  { return document.createElement(el);  }
